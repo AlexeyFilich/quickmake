@@ -1,0 +1,25 @@
+{
+    "project": "program",
+    "compiler": {
+        "path": "g++",
+        "flags": "-std=c++17 -static-libstdc++ -static-libgcc",
+        "include_path": [
+            "include/",
+            "third-party/toolbox/"
+        ],
+        "library_path": [
+            "lib/"
+        ]
+    },
+    "main": {
+        "path": "src/main.cpp",
+        "output_name": "main.out",
+        "flags": "",
+        "binaries": ""
+    },
+    "sources": [
+    ],
+    "extra_commands": [
+        "cp build/src/main.out bin/main"
+    ]
+}
