@@ -1,0 +1,2 @@
+compiler: "use \"gcc\", please"
+Hello world

@@ -53,7 +53,7 @@ printf -- "\e[38;05;2;49;24;27m-- Compiler: \e[0m \e[38;05;3;49;04;27mg++\e[0m\n
 
 recompile="False"
 printHeader src/main.cpp
-checkRecomp src/main.cpp build/src/main.hash build/src/ build/src/main.o 
+checkRecomp src/main.cpp build/src/main.hash build/src/ build/src/main.out
 if [ $recompile == "True" ] || [ $main_should_recompile == "True" ]
 then
     g++ -std=c++17 -static-libstdc++ -static-libgcc  -I"include/" -I"third-party/toolbox/" -L"lib/" src/main.cpp -o build/src/main.out
@@ -64,3 +64,7 @@ fi
 cp build/src/main.out bin/main
 
 printf -- "\n\e[38;05;2;49;24;27mDone! in \e[0m[38;05;3;49;04;27m$(($(date '+%s') - $start))sec.[0m\n"
+
+printf -- "\n-- Starting\n"
+./bin/main
+printf -- "-- Done\n"
