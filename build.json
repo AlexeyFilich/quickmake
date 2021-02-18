@@ -20,6 +20,9 @@
     "sources": [
     ],
     "extra_commands": [
-        "cp build/src/main.out bin/main"
+        "cp build/src/main.out bin/main",
+        "echo -- Starting",
+        "./bin/main",
+        "echo -- Done"
     ]
 }

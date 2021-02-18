@@ -56,15 +56,15 @@ printHeader src/main.cpp
 checkRecomp src/main.cpp build/src/main.hash build/src/ build/src/main.out
 if [ $recompile == "True" ] || [ $main_should_recompile == "True" ]
 then
-    g++ -std=c++17 -static-libstdc++ -static-libgcc  -I"include/" -I"third-party/toolbox/" -L"lib/" src/main.cpp -o build/src/main.out
+    printf -- "..... \e[38;05;3;49;04;27mmain.cpp\e[0m \e[38;05;10;49;24;27mis updating, because other files have changed\e[0m\n"
+    g++ -std=c++17 -static-libstdc++ -static-libgcc -I"include/" -I"third-party/toolbox/" -L"lib/" src/main.cpp -o build/src/main.out 
     checkSuccess build/src/main.out build/src/main.hash
     echo "$(md5sum src/main.cpp)" > build/src/main.hash
 fi
 
 cp build/src/main.out bin/main
+echo -- Starting
+./bin/main
+echo -- Done
 
 printf -- "\n\e[38;05;2;49;24;27mDone! in \e[0m[38;05;3;49;04;27m$(($(date '+%s') - $start))sec.[0m\n"
-
-printf -- "\n-- Starting\n"
-./bin/main
-printf -- "-- Done\n"

@@ -1,2 +1,44 @@
-compiler: "use \"gcc\", please"
-Hello world
+@ build
+
+DEFAULT {
+    compiler: "g++"
+    search_include {
+        "include/"
+    }
+    search_binary {
+        "lib/"
+    }
+}
+
+OBJ1 {
+    DEFAULT
+    file: "src/file1.cpp"
+} # g++ -I"include/" -L"lib/" src/file1.cpp -c -o build/src/file1.cpp.o
+
+MAIN {
+    DEFAULT
+    flags {
+        "-std=c++17"
+        # "-static-libstdc++"
+        "-static-libgcc"
+    }
+    use {
+        "OBJ1"
+    }
+    libraries {
+        "-lSDL2"
+    }
+    file: "src/main.cpp"
+    out: "main.out"
+} # g++ -std=c++17 -static-libgcc -I"include/" -L"lib/" src/main.cpp -o build/src/main.out build/src/file1.cpp.o -lSDL2
+
+build("MAIN")
+
+@ success
+
+print("Success")
+run("./build/src/main.out")
+
+@ failure
+
+print("Failure")
