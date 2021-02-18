@@ -1,29 +1,3 @@
-class Position {
-    public:
-        Position(std::string, int, int, int);
-        ~Position();
-        void next(char ch);
-
-        std::string filename;
-        int index, line, column;
-};
-
-Position::Position(std::string filename, int index, int line, int column) : filename(filename), index(index), line(line), column(column) {
-}
-
-Position::~Position() {
-}
-
-void Position::next(char ch) {
-    this->index++;
-    if (ch == '\n') {
-        this->column = 0;
-        this->line++;
-    } else {
-        this->column++;
-    }
-}
-
 enum TokenType {
     T_IDENTIFIER,
     T_STRING,
@@ -41,6 +15,7 @@ class Token {
 
         TokenType getType();
         std::string getValue();
+        Position getPosition();
         std::string toString();
         bool compare(TokenType);
         bool compare(TokenType, std::string);
@@ -58,6 +33,10 @@ TokenType Token::getType() {
 
 std::string Token::getValue() {
     return this->value;
+}
+
+Position Token::getPosition() {
+    return this->pos;
 }
 
 std::string Token::toString() {
@@ -83,7 +62,7 @@ class Tokenizer {
     private:
         char current = '\0';
         Position pos;
-        std::string filename, text, special;
+        std::string text, special;
         std::vector<Token> tokens;
 
         inline static const std::string WHITESPACE = " \t\r\n";
@@ -100,7 +79,7 @@ class Tokenizer {
         std::vector<Token> makeTokens();
 };
 
-Tokenizer::Tokenizer(std::string filename, std::string special) : filename(filename), special(special), pos(filename, -1, 0, -1) {
+Tokenizer::Tokenizer(std::string filename, std::string special) : special(special), pos(filename, -1, 0, -1) {
     std::fstream file(filename);
     if (!file)
         throwError("FileReadError", MakeString() << "Can't open file '" << filename << "'");
@@ -143,7 +122,7 @@ void Tokenizer::makeString() {
                     case 't': string += "\t"; break;
                     // case 'v': string += "\v"; break;
                     default:
-                        throwError(this->filename, this->pos.line, this->pos.column, "UnexpectedCharError", MakeString() << "'\\" << this->current << "' is an illegal escape sequence");
+                        throwError(this->pos, "UnexpectedCharError", MakeString() << "'\\" << this->current << "' is an illegal escape sequence");
                         break;
                 }
                 escape = false;
@@ -154,7 +133,7 @@ void Tokenizer::makeString() {
         this->next();
     }
     if (this->current != quote_type) {
-        throwError(this->filename, this->pos.line, this->pos.column, "UnexpectedCharError", MakeString() << "Expected '" << quote_type << "' but got '" << this->current << "'");
+        throwError(this->pos, "UnexpectedCharError", MakeString() << "Expected '" << quote_type << "' but got '" << this->current << "'");
     }
     this->next();
     this->tokens.emplace_back(T_STRING, string, this->pos);
@@ -165,7 +144,7 @@ std::vector<Token> Tokenizer::makeTokens() {
         if (this->in(Tokenizer::WHITESPACE)) {
             this->next();
         } else if (this->in("#")) {
-            while (this->current != '\n' || this->current != '\0')
+            while (this->current != '\n' && this->current != '\0')
                 this->next();
         } else if (this->in(Tokenizer::LETTERS + "_")) {
             std::string string = "";
@@ -180,7 +159,7 @@ std::vector<Token> Tokenizer::makeTokens() {
             this->tokens.emplace_back(T_SPECIAL, std::string(1, this->current), this->pos);
             this->next();
         } else {
-            throwError(this->filename, this->pos.line, this->pos.column, "UnexpectedCharError", MakeString() << "Charecter '" << this->current << "' is unexpected");
+            throwError(this->pos, "UnexpectedCharError", MakeString() << "Charecter '" << this->current << "' is unexpected");
         }
     }
     this->tokens.emplace_back(T_SPECIAL, "<EOF>", this->pos);
